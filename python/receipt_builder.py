@@ -129,16 +129,25 @@ def generate_header_file(
     if isinstance(fav_raw, str):
         fav_raw = [fav_raw] if fav_raw else []
     fav = _cap(_escape_cpp(fav_raw[0] if fav_raw else ""))
-    notes = _cap(_escape_cpp(thoughts.get("notes", "")))
     popularity = album_data.get("popularity") or 0
     tags = _cap(_escape_cpp(" / ".join(album_data.get("genres", []))))
+    notes = _escape_cpp(thoughts.get("notes", ""))
 
     n = len(tracks)
     track_lines = []
+    escaped_titles = []
+    escaped_durs = []
     for t in tracks:
-        title = _cap(_escape_cpp(t["title"]))
+        title = _escape_cpp(t["title"])
         dur = _escape_cpp(t["duration"])
+        escaped_titles.append(title)
+        escaped_durs.append(dur)
         track_lines.append(f'  {{"{title}", "{dur}"}}')
+
+    col_width = max(
+        max((len(s) for s in escaped_titles), default=0),
+        max((len(s) for s in escaped_durs), default=0),
+    ) + 1  # +1 for null terminator
 
     tracks_body = ",\n".join(track_lines)
 
@@ -148,7 +157,7 @@ const char* ARTIST      = "{artist}";
 const char* ALBUM       = "{album}";
 const char* YEAR        = "{year}";
 const int   TRACK_COUNT = {n};
-const char  TRACKS[{n}][2][40] = {{
+const char  TRACKS[{n}][2][{col_width}] = {{
 {tracks_body}
 }};
 const char* TOTAL_TIME  = "{total}";

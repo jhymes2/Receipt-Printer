@@ -9,3 +9,7 @@ thoughts/*
 !thoughts/.gitkeep
 arduino/src/receipt_data.h
 python/.venv/
+.cache
+.gitignore.swp
+CLAUDE.md
+Receipt.code-workspace

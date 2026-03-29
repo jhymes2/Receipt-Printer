@@ -30,7 +30,7 @@ def _lastfm_album_info(artist: str, album: str) -> dict:
         playcount = info.get("playcount")
         return {"genres": genres, "popularity": int(playcount) if playcount else None}
     except Exception:
-        return {"genres": [], "listeners": None}
+        return {"genres": [], "popularity": None}
 
 
 def _ms_to_mss(ms: int) -> str:

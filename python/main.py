@@ -74,25 +74,6 @@ def pick_album(candidates: list[dict]) -> dict:
         print(f"Enter a number between 1 and {len(candidates)}.")
 
 
-def pick_favorite_tracks(tracks: list[dict]) -> list[str]:
-    track_map = {t["number"]: t["title"] for t in tracks}
-    print("\nTracks:")
-    for t in tracks:
-        print(f"  {t['number']:2d}. {t['title']}")
-    while True:
-        raw = input("Favorite tracks (numbers, space-separated): ").strip()
-        nums = []
-        valid = True
-        for token in raw.split():
-            if token.isdigit() and int(token) in track_map:
-                nums.append(int(token))
-            else:
-                valid = False
-                break
-        if valid and nums:
-            return [track_map[n] for n in nums]
-        print("Enter one or more track numbers from the list above.")
-
 
 def _pio() -> str:
     """Return the pio executable path, searching common install locations."""
@@ -138,14 +119,17 @@ def main() -> None:
     print(f"\nFetching track data for '{chosen['name']}'...")
     album_data = get_album_data(chosen["id"])
 
-    fav_track = pick_favorite_tracks(album_data["tracks"])
-
     thoughts_dir = ROOT / "thoughts"
     thoughts_path = open_thoughts(
-        album_data["artist"], album_data["album"], thoughts_dir
+        album_data["artist"], album_data["album"], thoughts_dir, album_data["tracks"]
     )
     thoughts_data = read_thoughts(thoughts_path)
-    thoughts_data["fav_track"] = fav_track
+    # Resolve fav track numbers to titles ("3 7 11" → [title3, title7, title11])
+    fav_str = (thoughts_data["fav_track"] or [""])[0]
+    if fav_str:
+        track_map = {t["number"]: t["title"] for t in album_data["tracks"]}
+        nums = [int(tok) for tok in fav_str.split() if tok.isdigit() and int(tok) in track_map]
+        thoughts_data["fav_track"] = [track_map[n] for n in nums]
 
     # Capture preview text, then print it
     buf = io.StringIO()

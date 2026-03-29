@@ -13,7 +13,7 @@ def _slugify(text: str) -> str:
     return text
 
 
-def open_thoughts(artist: str, album: str, thoughts_dir: Path) -> Path:
+def open_thoughts(artist: str, album: str, thoughts_dir: Path, tracks: list[dict] | None = None) -> Path:
     """Create a timestamped thoughts file and open it in the editor.
 
     Waits for the user to close the file before returning.
@@ -25,13 +25,20 @@ def open_thoughts(artist: str, album: str, thoughts_dir: Path) -> Path:
     filepath = thoughts_dir / filename
 
     if not filepath.exists():
+        track_ref = ""
+        if tracks:
+            lines = ["\n\n---"]
+            for t in tracks:
+                lines.append(f"{t['number']:2d}. {t['title']}")
+            track_ref = "\n".join(lines)
         content = (
             f"# {album} — {artist}\n"
             f"Date: {today}\n"
             "\n"
             "Rating: \n"
+            "Fav: \n"
             "Notes:\n"
-            "Paragraph:\n"
+            f"{track_ref}\n"
         )
         filepath.write_text(content, encoding="utf-8")
 
@@ -44,13 +51,16 @@ def _open_in_editor(filepath: Path) -> None:
 
 
 def read_thoughts(filepath: Path) -> dict:
-    """Parse a thoughts file and return rating and notes."""
+    """Parse a thoughts file and return rating, fav_track, and notes."""
     text = filepath.read_text(encoding="utf-8")
-    result = {"rating": "", "notes": "", "paragraph": ""}
+    result = {"rating": "", "fav_track": [], "notes": "", "paragraph": ""}
 
     for line in text.splitlines():
         if line.startswith("Rating:"):
             result["rating"] = line[len("Rating:"):].strip()
+        elif line.startswith("Fav:"):
+            fav = line[len("Fav:"):].strip()
+            result["fav_track"] = [fav] if fav else []
         elif line.startswith("Notes:"):
             result["notes"] = line[len("Notes:"):].strip()
         elif line.startswith("Paragraph:"):

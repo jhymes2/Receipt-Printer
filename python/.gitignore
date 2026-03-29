@@ -1,0 +1,6 @@
+.env
+.envrc
+.venv
+.gitignore.swp
+.cache
+_pychache_
