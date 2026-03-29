@@ -1,0 +1,11 @@
+.env
+.cache
+.pio/
+__pycache__/
+*.pyc
+receipts/*
+!receipts/.gitkeep
+thoughts/*
+!thoughts/.gitkeep
+arduino/src/receipt_data.h
+python/.venv/

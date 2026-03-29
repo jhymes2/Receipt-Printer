@@ -1,3 +1,5 @@
+source .venv/bin/activate
+
 # PROJECT STRUCTURE
 
 /spotify-receipt/

@@ -1,9 +1,10 @@
 import os
+from pathlib import Path
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 
 def get_spotify_client() -> spotipy.Spotify:
