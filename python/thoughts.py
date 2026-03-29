@@ -40,25 +40,7 @@ def open_thoughts(artist: str, album: str, thoughts_dir: Path) -> Path:
 
 
 def _open_in_editor(filepath: Path) -> None:
-    # Try VS Code first (--wait blocks until the tab is closed)
-    try:
-        result = subprocess.run(
-            ["code", "--wait", str(filepath)],
-            check=True,
-            timeout=300,
-        )
-        return
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        pass
-
-    # Fallback: OS default opener, then prompt
-    opener = "open" if sys.platform == "darwin" else "xdg-open"
-    try:
-        subprocess.run([opener, str(filepath)], check=True)
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        pass
-
-    input(f"Edit {filepath} then press Enter when done...")
+    subprocess.run(["vi", str(filepath)], check=True)
 
 
 def read_thoughts(filepath: Path) -> dict:

@@ -1,8 +1,12 @@
+import io
 import os
+import re
 import subprocess
 import sys
 import termios
 import tty
+from contextlib import redirect_stdout
+from datetime import date
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -143,9 +147,14 @@ def main() -> None:
     thoughts_data = read_thoughts(thoughts_path)
     thoughts_data["fav_track"] = fav_track
 
-    # Clear terminal then show preview
+    # Capture preview text, then print it
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        preview_receipt(album_data, thoughts_data)
+    preview_text = buf.getvalue()
+
     os.system("clear" if sys.platform != "win32" else "cls")
-    preview_receipt(album_data, thoughts_data)
+    print(preview_text, end="")
 
     answer = input("\nPrint this? (y/n): ").strip().lower()
     if answer != "y":
@@ -158,6 +167,14 @@ def main() -> None:
 
     receipt_path = archive_receipt(album_data, thoughts_data, ROOT / "receipts")
     print(f"Archived receipt → {receipt_path.relative_to(ROOT)}")
+
+    slug = re.sub(r"[^\w\s-]", "", album_data["album"].lower())
+    slug = re.sub(r"[\s_]+", "-", slug).strip("-")
+    fmt_dir = ROOT / "format-receipts"
+    fmt_dir.mkdir(exist_ok=True)
+    fmt_path = fmt_dir / f"{slug}_{date.today().isoformat()}.txt"
+    fmt_path.write_text(preview_text, encoding="utf-8")
+    print(f"Saved preview → {fmt_path.relative_to(ROOT)}")
 
     upload_to_printer(ROOT / "arduino")
 
