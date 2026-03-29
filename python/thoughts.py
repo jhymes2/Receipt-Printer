@@ -43,7 +43,7 @@ def _open_in_editor(filepath: Path) -> None:
     # Try VS Code first (--wait blocks until the tab is closed)
     try:
         result = subprocess.run(
-            ["code", "--wait", str(filepath)],
+            ["vi", "--wait", str(filepath)],
             check=True,
             timeout=300,
         )
