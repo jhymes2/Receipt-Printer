@@ -125,3 +125,4 @@ def get_album_data(album_id: str) -> dict:
         "tracks": tracks,
         "total_duration": _ms_to_total(total_ms),
     }
+
