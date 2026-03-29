@@ -13,3 +13,5 @@ python/.venv/
 .gitignore.swp
 CLAUDE.md
 Receipt.code-workspace
+.claude
+.venv
